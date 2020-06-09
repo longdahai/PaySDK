@@ -4,3 +4,4 @@
 /test/*/php_errors.log
 /test/Weixin/cert
 /test/*/paymode1_notify_result.txt
+/.idea
