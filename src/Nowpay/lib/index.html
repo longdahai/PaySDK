@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>H5测试demo</title>
+</head>
+<body>
+	<form action="./nowPay.php" method="post"><br>
+		订单名称:<input type="text" name="mhtOrderName" value="测试"/><br/><br>
+		订单金额:<input type="text" name="mhtOrderAmt" value="1" /><br/><br>
+		订单描述:<input type="text" name="mhtOrderDetail" value="测试订单" /><br/><br>
+		请选择以下支付方式<br/><br>
+			<input type="radio" name="payType[]" value="weixin" checked="checked">微信<br/>
+			<input type="radio" name="payType[]" value="zhifubao">支付宝<br/>
+			<br>
+		请选择调起方式 <br><br>
+			<input type="radio" name="outputType[]" value="0" checked="checked">直接调起 <br>	
+			<input type="radio" name="outputType[]" value="1">返回链接 <br><br>	
+		<input type="submit" value="提交">
+	</form>
+</body>
+</html>
