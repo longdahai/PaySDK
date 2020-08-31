@@ -2,6 +2,7 @@
 
 namespace Yurun\PaySDK\Ttalipay;
 
+use think\Log;
 use \Yurun\PaySDK\Base;
 use \Yurun\PaySDK\Lib\ObjectToArray;
 
@@ -147,26 +148,30 @@ class SDK extends Base
      */
     public function verifyCallback($data)
     {
-        if (!isset($data['sign'], $data['sign_type'])) {
-            return false;
-        }
-        $content = $this->parseSignData($data);
-        if (empty($this->publicParams->appPublicKeyFile)) {
-            $key = $this->publicParams->appPublicKey;
-            $method = 'verifyPublic';
+        require __DIR__ . '/tools/SignAndCheck.php';
+        $signature = $data['sign'];
+        $data['sign'] = '';
+        $data['sign_type'] = '';
+        $strData = getStr($data);
+        if (verify($strData, $signature, $this->publicParams->appPublicKeyFile)) {
+            Log::info("验证成功\n");
+            if ($data['status'] == '1') {
+                Log::info("交易成功");
+                return true;
+            } else if ($data['status'] == '2') {
+                Log::info("交易处理中");
+            } else if ($data['status'] == '3') {
+                Log::info("已支付等待确认收货");
+            } else {
+                Log::info("交易失败");
+            }
+            $arr = array('resp_code' => '000000');
+            echo json_encode($arr);
         } else {
-            $key = $this->publicParams->appPublicKeyFile;
-            $method = 'verifyPublicFromFile';
-        }
-        switch ($this->publicParams->sign_type) {
-            case 'DSA':
-                return \Yurun\PaySDK\Lib\Encrypt\DSA::$method($content, $key, \base64_decode($data['sign']));
-            case 'RSA':
-                return \Yurun\PaySDK\Lib\Encrypt\RSA::$method($content, $key, \base64_decode($data['sign']));
-            case 'MD5':
-                return $data['sign'] === md5($content . $this->publicParams->md5Key);
-            default:
-                throw new \Exception('未知的加密方式：' . $this->publicParams->sign_type);
+            Log::info("验证失败");
+            $arr = array('resp_code' => '999999');
+            $this->_error = $arr;
+            return false;
         }
     }
 
